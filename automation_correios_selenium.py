@@ -1,116 +1,181 @@
 import time
 from selenium import webdriver
-from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.common.by import By
-from selenium.webdriver.support.ui import Select
 
-
-#=============== Dados remetente ========================== #
+# =========================================================
+# DADOS FIXOS (HOJE HARDCODED)
+# ---------------------------------------------------------
+# ⚠️ NO FUTURO:
+# Esses dados serão substituídos por dados vindos da API
+# do Google Sheets (lidos em outro arquivo Python).
+# =========================================================
 
 CEP = "32670-278"
-ENDERECO = "R. dos Inconfidentes - Chácaras, Betim - MG"
+ENDERECO = "R. dos Inconfidentes"
 NUMERO = "437"
 NOME = "TH Gráfica"
 COMPLEMENTO = "Galpão / Gráfica"
 BAIRRO = "Chácaras"
 CIDADE = "BETIM"
 
-
-# ========================================================= #
-
-# Código Principal
+# =========================================================
+# INICIALIZAÇÃO DO SELENIUM
+# ---------------------------------------------------------
+# Abre o Chrome e acessa o Endereçador dos Correios
+# =========================================================
 
 driver = webdriver.Chrome()
-driver.get("https://www2.correios.com.br/enderecador/encomendas/default.cfm?etq=1&tipo=rem#form1")
+driver.get(
+    "https://www2.correios.com.br/enderecador/encomendas/default.cfm?etq=1&tipo=rem#form1"
+)
 driver.maximize_window()
+
+# Aguarda carregamento completo da página
 time.sleep(5)
 
-# Função Principal 
+# =========================================================
+# FUNÇÃO: prenchimento (REMETENTE)
+# ---------------------------------------------------------
+# Preenche os dados do REMETENTE nas 4 etiquetas
+# Os IDs seguem o padrão: campo_1, campo_2, campo_3, campo_4
+# =========================================================
 
-def abrir_correio():
+def prenchimento():
 
-    # botão span dos correios para logar
-
+    # -----------------------------------------------------
+    # Função interna para fechar pop-ups (botão "X")
+    # Os Correios exibem modais aleatórios durante o uso
+    # -----------------------------------------------------
     def bt_fechar():
-        bt_x = driver.find_element(By.XPATH,"/html/body/div[1]/div[3]/div[2]/div/div/div[2]/div[2]/div[3]/div/span")
-        bt_x.click()
-        time.sleep(1)
+        try:
+            bt_x = driver.find_element(
+                By.XPATH,
+                "/html/body/div[1]/div[3]/div[2]/div/div/div[2]/div[2]/div[3]/div/span"
+            )
+            bt_x.click()
+        except:
+            # Caso o popup não exista, ignora
+            pass
 
+    # Fecha popup inicial, se existir
     bt_fechar()
 
-    # Campo CEP
+    # -----------------------------------------------------
+    # Loop principal
+    # Preenche as 4 etiquetas (1 a 4)
+    # -----------------------------------------------------
+    for i in range(1, 5):
 
-    campo_cep = driver.find_element(By.XPATH, "/html/body/div[1]/div[3]/div[2]/div/div/div[2]/div[2]/div[2]/form/div[2]/div/p/span/label/input[1]")
-    campo_cep.clear()
-    campo_cep.send_keys(CEP)
-    time.sleep(0.8)
-    
-    campo_endereco = driver.find_element(By.XPATH, "/html/body/div[1]/div[3]/div[2]/div/div/div[2]/div[2]/div[2]/form/div[2]/div/span[2]/label/input")
-    campo_endereco.click()
-    time.sleep(2)
-    bt_fechar()
+        # CEP do remetente
+        driver.find_element(By.ID, f"cep_{i}").clear()
+        driver.find_element(By.ID, f"cep_{i}").send_keys(CEP)
 
-    # Campo ENDEREÇO
+        # Clique no endereço força o site a validar o CEP
+        driver.find_element(By.ID, f"endereco_{i}").click()
+        time.sleep(2)
 
-    campo_endereco = driver.find_element(By.XPATH, "/html/body/div[1]/div[3]/div[2]/div/div/div[2]/div[2]/div[2]/form/div[2]/div/span[2]/label/input")
-    campo_endereco.clear()
-    campo_endereco.send_keys(ENDERECO)
-    time.sleep(1)
+        # Fecha possíveis pop-ups após validação do CEP
+        bt_fechar()
 
-    # campo NÚMERO
+        # Nome do remetente
+        driver.find_element(By.ID, f"nome_{i}").clear()
+        driver.find_element(By.ID, f"nome_{i}").send_keys(NOME)
 
-    campo_numero = driver.find_element(By.XPATH, "//*[@id='numero_1']")
-    campo_numero.clear()
-    campo_numero.send_keys(NUMERO)
-    time.sleep(1)
+        # Endereço
+        driver.find_element(By.ID, f"endereco_{i}").clear()
+        driver.find_element(By.ID, f"endereco_{i}").send_keys(ENDERECO)
 
-    # campo NOME
+        # Número
+        driver.find_element(By.ID, f"numero_{i}").clear()
+        driver.find_element(By.ID, f"numero_{i}").send_keys(NUMERO)
 
-    campo_nome = driver.find_element(By.XPATH, "//*[@id='nome_1']")
-    campo_nome.clear()
-    campo_nome.send_keys(NOME)
+        # Complemento
+        driver.find_element(By.ID, f"complemento_{i}").clear()
+        driver.find_element(By.ID, f"complemento_{i}").send_keys(COMPLEMENTO)
 
-    # campo COMPLEMENTO
-    
-    campo_complemento = driver.find_element(By.XPATH, "//*[@id='complemento_1']")
-    campo_complemento.clear()
-    campo_complemento.send_keys(COMPLEMENTO)
-    time.sleep(1)    
+        # Bairro
+        driver.find_element(By.ID, f"bairro_{i}").clear()
+        driver.find_element(By.ID, f"bairro_{i}").send_keys(BAIRRO)
 
-    # campo BAIRRO
+        # Cidade
+        driver.find_element(By.ID, f"cidade_{i}").clear()
+        driver.find_element(By.ID, f"cidade_{i}").send_keys(CIDADE)
 
-    campo_bairro = driver.find_element(By.XPATH, "//*[@id='bairro_1']")
-    campo_bairro.clear()
-    campo_bairro.send_keys(BAIRRO)
-    time.sleep(1)    
+# =========================================================
+# FUNÇÃO: preencher_despachante (DESTINATÁRIO FIXO)
+# ---------------------------------------------------------
+# O despachante é FIXO e NÃO vem da planilha
+# Os IDs seguem o padrão: desCampo_1, desCampo_2, etc.
+# =========================================================
 
-    # campo CIDADE
+def preencher_despachante():
 
-    campo_cidade = driver.find_element(By.XPATH, "//*[@id='cidade_1']")
-    campo_cidade.clear()
-    campo_cidade.send_keys(CIDADE)
-    time.sleep(1)
+    # Função interna para fechar pop-ups
+    def bt_fechar():
+        try:
+            bt_x = driver.find_element(
+                By.XPATH,
+                "/html/body/div[1]/div[3]/div[2]/div/div/div[2]/div[2]/div[3]/div/span"
+            )
+            bt_x.click()
+        except:
+            pass
 
-    # 1. seleciona campo UF
-    campo_uf = driver.find_element(By.XPATH, "/html/body/div[1]/div[3]/div[2]/div/div/div[2]/div[2]/div[2]/form/div[2]/div/span[8]/label/select")
+    # Loop para as 4 etiquetas
+    for i in range(1, 5):
 
-    # 2. Instancia o objeto Select
-    select_uf = campo_uf.find_elements(By.TAG_NAME,"MG")
+        bt_fechar()
 
-    # 3. Seleciona uma opção
-    for MG in select_uf:
-        print("'O valor é: ")
+        # CEP do despachante
+        driver.find_element(By.ID, f"desCep_{i}").clear()
+        driver.find_element(By.ID, f"desCep_{i}").send_keys(CEP)
 
-    
-    time.sleep(1)
+        # Clique para validação do CEP
+        driver.find_element(By.ID, f"desEndereco_{i}").click()
+        time.sleep(2)
 
+        bt_fechar()
 
-    time.sleep(5)
+        # Nome
+        driver.find_element(By.ID, f"desNome_{i}").clear()
+        driver.find_element(By.ID, f"desNome_{i}").send_keys(NOME)
 
+        # Endereço
+        driver.find_element(By.ID, f"desEndereco_{i}").clear()
+        driver.find_element(By.ID, f"desEndereco_{i}").send_keys(ENDERECO)
 
+        # Número
+        driver.find_element(By.ID, f"desNumero_{i}").clear()
+        driver.find_element(By.ID, f"desNumero_{i}").send_keys(NUMERO)
+
+        # Complemento
+        driver.find_element(By.ID, f"desComplemento_{i}").clear()
+        driver.find_element(By.ID, f"desComplemento_{i}").send_keys(COMPLEMENTO)
+
+        # Bairro
+        driver.find_element(By.ID, f"desBairro_{i}").clear()
+        driver.find_element(By.ID, f"desBairro_{i}").send_keys(BAIRRO)
+
+        # Cidade
+        driver.find_element(By.ID, f"desCidade_{i}").clear()
+        driver.find_element(By.ID, f"desCidade_{i}").send_keys(CIDADE)
+
+        # Autorização (checkbox / radio)
+        driver.find_element(By.ID, f"aut0_{i}").click()
+
+# =========================================================
+# EXECUÇÃO DO SCRIPT
+# ---------------------------------------------------------
+# Ordem correta:
+# 1) Preenche remetente
+# 2) Preenche despachante
+# =========================================================
 
 try:
-    abrir_correio()
-    print("O código rodou por completo !")
+    prenchimento()
+    preencher_despachante()
+    print("O código rodou por completo!")
 except Exception as e:
     print(f"Erro ocorrido: {e}")
+
+    #https://www.youtube.com/watch?v=6XaF4ZF7LW0
