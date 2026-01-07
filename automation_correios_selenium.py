@@ -2,6 +2,7 @@ import time
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 
+
 # =========================================================
 # DADOS FIXOS (HOJE HARDCODED)
 # ---------------------------------------------------------
@@ -17,6 +18,7 @@ NOME = "TH Gráfica"
 COMPLEMENTO = "Galpão / Gráfica"
 BAIRRO = "Chácaras"
 CIDADE = "BETIM"
+
 
 # =========================================================
 # INICIALIZAÇÃO DO SELENIUM
@@ -162,6 +164,7 @@ def preencher_despachante():
 
         # Autorização (checkbox / radio)
         driver.find_element(By.ID, f"aut0_{i}").click()
+        
 
 # =========================================================
 # EXECUÇÃO DO SCRIPT
@@ -174,6 +177,7 @@ def preencher_despachante():
 try:
     prenchimento()
     preencher_despachante()
+    time.sleep(5)
     print("O código rodou por completo!")
 except Exception as e:
     print(f"Erro ocorrido: {e}")
